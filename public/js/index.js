@@ -16,6 +16,9 @@ import witchFace from "../assets/character-faces/witch-face-1.png";
 import witchFace2 from "../assets/character-faces/witch-face-2.png";
 import hills from "../assets/hills.png";
 import startScreen from "../assets/startScreen.png";
+import tiles from "../assets/tilemaps/tiles/gridtiles.png";
+import map from "../assets/tilemaps/maps/simple-map.json";
+
 //import egg from "../assets/egg.png";
 //import grassEgg from "../assets/grass-egg.png";
 // Import the functions you need from the SDKs you need
@@ -38,10 +41,15 @@ const firebaseConfig = {
 
 const config = {
   type: Phaser.AUTO,
+  width:1280,
+  height:720,
   parent: "game",
+
+  /*
   scale : {
     mode: Phaser.Scale.Fit
   },
+  */
   physics: {
     default: 'arcade',
     arcade: {
@@ -98,83 +106,42 @@ function preload() {
   this.load.image('hills', hills);
   //this.load.image('egg', egg);
   //this.load.image('grassEgg', grassEgg);
+  this.load.image('tiles', tiles);
+  this.load.tilemapTiledJSON('map', map);
 }
 
 function create() {
 
-  //loading screen
-  let bg = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, "startScreen");
-  let scale = Math.max(this.cameras.main.width / bg.width, this.cameras.main.height / bg.height);
-  bg.setScale(scale);
-  bg.setDepth(10);
+  const map = this.make.tilemap({ key: 'map' });
+  //const tileset = map.addTilesetImage('farmBackground', 'farmBackground');
+  //const layer = map.createLayer('Tile Layer 1', tileset, 0, 0);
 
-  /*
-  let stardew = this.add.image(450, 332, 'stardew');
-  stardew.setDepth(7);
-  stardew.setScale(1.2);  
-  
-  let witchFace = this.physics.add.image(352, 352, "witchFace");
-  witchFace.setDepth(8);
-  witchFace.setScale(0.5);
-  witchFace.setVelocity(200, 200);
-  witchFace.setBounce(0.5, 1);
-  witchFace.setCollideWorldBounds(true);
-
-  let witchFace2 = this.physics.add.image(672, 352, "witchFace2");
-  witchFace2.setDepth(8);
-  witchFace2.setScale(0.5);
-  witchFace2.setVelocity(200, 200);
-  witchFace2.setBounce(0.7, 1);
-  witchFace2.setCollideWorldBounds(true);
-  */
-  bg.setInteractive();
-  bg.on('pointerup', function() {
-    bg.setAlpha(0);
-    /*
-    witchFace.setAlpha(0);
-    witchFace2.setAlpha(0);
-    stardew.setAlpha(0);   
-    */
-  });
-  //end loading screen
-
-  this.scale.on('resize', function (gameSize)
-  {
-
-      const width = gameSize.width;
-      const height = gameSize.height;
-
-      this.cameras.resize(width, height);
-
-      //bg.setSize(width, height);
-      //logo.setPosition(width / 2, height / 2);
-
-  }, this);
-
-  
-  //platforms.create(600, 400, '');
-  
-  
+  createStartScreen(this);
   //gamedesign
-  let background = this.add.image(352, 352, "farmBackground");
+  let background = this.add.image(640, 310, "farmBackground");
+
   gameState.music = this.sound.play('startMusic', {
     loop: true,
     volume: 0.1
   });
+  /*
+  this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight: 32 });
+  this.tileset = this.map.addTilesetImage('tiles');
+  this.layer = this.map.createLayer('Level1', this.tileset);
+  this.map.setCollision([ 20, 48 ]);
   
-  // var platforms = this.physics.add.staticGroup();
-
-  // platforms.create(200, 352, 'farmBackground');
-
-  gameState.cropText = this.add.text(760, 620, 'Crop Total:' + gameState.numCrops, { fontSize: '30px', fill: '#FFFFFF' });
+  this.physics.add.collider(this.player, this.layer);
+  */
+  gameState.cropText = this.add.text(760, 675, 'Crop Total:' + gameState.numCrops, { fontSize: '30px', fill: '#FFFFFF' });
   //gameState.eggText = this.add.text(760, 650, 'Egg Total:' + gameState.numEggs, { fontSize: '30px', fill: '#FFFFFF' });
 
-  gameState.seedButton = this.add.image(864, 100, "seeds");
-  gameState.seedButton.setScale(2);
-  gameState.waterButton = this.add.image(864, 300, "wateringcan");
-  gameState.waterButton.setScale(2);
-  gameState.scytheButton = this.add.image(864, 500, "scythe");
-  gameState.scytheButton.setScale(2);
+  //bottom bar
+  gameState.seedButton = this.add.image(320, 695, "seeds");
+  gameState.seedButton.setScale(1);
+  gameState.waterButton = this.add.image(444, 695, "wateringcan");
+  gameState.waterButton.setScale(1);
+  gameState.scytheButton = this.add.image(555, 695, "scythe");
+  gameState.scytheButton.setScale(1);
 
   //character physics and navigation
   gameState.witchSprite = this.physics.add.sprite(352, 224, "witch");
@@ -183,49 +150,18 @@ function create() {
   //var bounds = new Phaser.Rectangle(100,100,400,400);
   gameState.witchSprite.setDepth(5);
   // gameState.setBounds(0, 120, 120, 200);
-  this.physics.add.collider(gameState.witchSprite); 
   
   //set movement keys
   gameState.movementKeys = this.input.keyboard.createCursorKeys();
   gameState.movementKeys = Object.assign(gameState.movementKeys, this.input.keyboard.addKeys("W,A,S,D"));
 
-  this.anims.create({
-    key: "left",
-    frames: this.anims.generateFrameNumbers("witch", {start: 3, end: 5}),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: "down",
-    frames: this.anims.generateFrameNumbers("witch", {start: 0, end: 2}),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: "up",
-    frames: this.anims.generateFrameNumbers("witch", {start: 6, end: 8}),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: "right",
-    frames: this.anims.generateFrameNumbers("witch", {start: 9, end: 11}),
-    frameRate: 5,
-    repeat: -1
-  });
-
-  // createBlock: function() {
-    
-  // }
+  createAnimations(this);
 
   //interactable tiles
   gameState.seedTiles = [];
   for (let i = 0; i < 2; i++) {
     for(let j = 0; j < 7; j++) {
-      gameState.seedTiles[j + i*7] = this.add.image(160 + 64*j, 352 + 64*i, "dirt");
+      gameState.seedTiles[j + i*7] = this.add.image(440 + 64*j, 352 + 64*i, "dirt");
       gameState.seedTiles[j + i*7].setInteractive();
       gameState.seedTiles[j + i*7].on('pointerup', function() {
         gameState.num += 1;
@@ -339,6 +275,43 @@ function update () {
   doMovement();
 }
 
+function createStartScreen(game){
+    //loading screen
+    let bg = game.add.image(game.cameras.main.width / 2, game.cameras.main.height / 2, "startScreen");
+    let scale = Math.max(game.cameras.main.width / bg.width, game.cameras.main.height / bg.height);
+    bg.setScale(scale);
+    bg.setDepth(10);
+  
+    /*
+    let stardew = this.add.image(450, 332, 'stardew');
+    stardew.setDepth(7);
+    stardew.setScale(1.2);  
+    
+    let witchFace = this.physics.add.image(352, 352, "witchFace");
+    witchFace.setDepth(8);
+    witchFace.setScale(0.5);
+    witchFace.setVelocity(200, 200);
+    witchFace.setBounce(0.5, 1);
+    witchFace.setCollideWorldBounds(true);
+  
+    let witchFace2 = this.physics.add.image(672, 352, "witchFace2");
+    witchFace2.setDepth(8);
+    witchFace2.setScale(0.5);
+    witchFace2.setVelocity(200, 200);
+    witchFace2.setBounce(0.7, 1);
+    witchFace2.setCollideWorldBounds(true);
+    */
+    bg.setInteractive();
+    bg.on('pointerup', function() {
+      bg.setAlpha(0);
+      /*
+      witchFace.setAlpha(0);
+      witchFace2.setAlpha(0);
+      stardew.setAlpha(0);   
+      */
+    });
+}
+
 function doMovement(){
   if (gameState.movementKeys.right.isDown && gameState.movementKeys.up.isDown || gameState.movementKeys.D.isDown && gameState.movementKeys.W.isDown) {
     gameState.witchSprite.x +=2;
@@ -379,4 +352,31 @@ function doMovement(){
   else {
     gameState.witchSprite.anims.stop();
   }
+}
+
+function createAnimations(animations) {
+  animations.anims.create({
+    key: "left",
+    frames: animations.anims.generateFrameNumbers("witch", {start: 3, end: 5}),
+    frameRate: 5,
+    repeat: -1
+  });
+  animations.anims.create({
+    key: "down",
+    frames: animations.anims.generateFrameNumbers("witch", {start: 0, end: 2}),
+    frameRate: 5,
+    repeat: -1
+  });
+  animations.anims.create({
+    key: "up",
+    frames: animations.anims.generateFrameNumbers("witch", {start: 6, end: 8}),
+    frameRate: 5,
+    repeat: -1
+  });
+  animations.anims.create({
+    key: "right",
+    frames: animations.anims.generateFrameNumbers("witch", {start: 9, end: 11}),
+    frameRate: 5,
+    repeat: -1
+  });
 }
