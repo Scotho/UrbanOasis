@@ -177,12 +177,6 @@ upgradeStatus(){
 }
 }
 
-<<<<<<< HEAD
-  
-  
-=======
->>>>>>> dae00552d01c2ae053cc2f8486433513fbdd1cd6
-
 export class Companion {
   constructor(petName){
     this.petName = petName;
@@ -193,13 +187,7 @@ export class Companion {
     this.hungry = 0;
     this.alive = true;
   }
-
-<<<<<<< HEAD
-
-
-//Bathroom Func
-=======
->>>>>>> dae00552d01c2ae053cc2f8486433513fbdd1cd6
+  
   increaseBathroom(){
     setInterval(() => {
       this.bathroom += 1;

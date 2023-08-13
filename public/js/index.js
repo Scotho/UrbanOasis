@@ -1,30 +1,47 @@
 import Phaser from "phaser";
-import farmbg from "./assets/background-image.png";
-import witch from "./assets/farmer-walk.png";
-import dirt from "./assets/grow/dirt.png";
-import sprout from "./assets/grow/sprout.png";
-import sounds from "./assets/mines-themes.mp3";
-import seeds from "./assets/grow/seeds.png";
-import tomato from "./assets/grow/tomato.png";
-import lettuce from "./assets/grow/lettuce.png";
-import artichoke from "./assets/grow/artichoke.png";
-import peppers from "./assets/grow/peppers.png";
-import corn from "./assets/grow/corn.png";
-import wateringcan from "./assets/wateringcan.png";
-import chicken from "./assets/chicken.png";
-import scythe from "./assets/scythe.png";
-import witchFace from "./assets/character-faces/witch-face-1.png";
-import witchFace2 from "./assets/character-faces/witch-face-2.png";
-import hills from "./assets/hills.png";
-import stardew from "./assets/stardew.png";
-import egg from "./assets/egg.png";
-import grassEgg from "./assets/grass-egg.png";
+import farmbg from "../assets/background-image.png";
+import witch from "../assets/farmer-walk.png";
+import dirt from "../assets/grow/dirt.png";
+import sprout from "../assets/grow/sprout.png";
+import sounds from "../assets/mines-themes.mp3";
+import seeds from "../assets/grow/seeds.png";
+import tomato from "../assets/grow/tomato.png";
+import lettuce from "../assets/grow/lettuce.png";
+import artichoke from "../assets/grow/artichoke.png";
+import peppers from "../assets/grow/peppers.png";
+import corn from "../assets/grow/corn.png";
+import wateringcan from "../assets/wateringcan.png";
+import scythe from "../assets/scythe.png";
+import witchFace from "../assets/character-faces/witch-face-1.png";
+import witchFace2 from "../assets/character-faces/witch-face-2.png";
+import hills from "../assets/hills.png";
+import startScreen from "../assets/startScreen.png";
+import egg from "../assets/egg.png";
+import grassEgg from "../assets/grass-egg.png";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCOu9vyAJ8Bqd2b0DJCvXvr8O6GkRo7O4A",
+  authDomain: "urbanoasis-b5be3.firebaseapp.com",
+  projectId: "urbanoasis-b5be3",
+  storageBucket: "urbanoasis-b5be3.appspot.com",
+  messagingSenderId: "759904250107",
+  appId: "1:759904250107:web:4372ac791def6d4dcae85e",
+  measurementId: "G-JZE2Z4X15F"
+};
 
 const config = {
   type: Phaser.AUTO,
   parent: "game",
-  width: 1024,
-  height: 704,
+  scale : {
+    mode: Phaser.Scale.Fit
+  },
   physics: {
     default: 'arcade',
     arcade: {
@@ -38,9 +55,13 @@ const config = {
   }
 };
 
+
 // var timerText;
 var timerEvent;
 const game = new Phaser.Game(config);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 
 const gameState = {
@@ -53,11 +74,14 @@ const gameState = {
   music: Audio
 }
 
+addEventListener("resize", (event) => {});
+
 
 
 function preload() {
-  this.load.image("farmBackground", farmbg);
+  this.load.image('startScreen', startScreen);
   this.load.audio('mines-themes', sounds);
+  this.load.image("farmBackground", farmbg);
   this.load.spritesheet("witch", witch, { frameWidth: 96, frameHeight: 128});
   this.load.image("sprout", sprout);
   this.load.image("seeds", seeds);
@@ -69,21 +93,21 @@ function preload() {
   this.load.image("peppers", peppers);
   this.load.image("wateringcan", wateringcan);
   this.load.image("scythe", scythe);
-  this.load.spritesheet("chicken", chicken, { frameWidth: 64, frameHeight: 64});
   this.load.image('witchFace', witchFace);
   this.load.image('witchFace2', witchFace2);
   this.load.image('hills', hills);
-  this.load.image('stardew', stardew);
   this.load.image('egg', egg);
   this.load.image('grassEgg', grassEgg);
 }
 
 function create() {
-  //loading screen
-  let hills = this.add.image(352,352, "hills");
-  hills.setDepth(6);
-  hills.setScale(0.8);
 
+  //loading screen
+  let bg = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, "startScreen");
+  let scale = Math.max(this.cameras.main.width / bg.width, this.cameras.main.height / bg.height)
+  bg.setScale(scale);
+  bg.setDepth(10);
+  /*
   let stardew = this.add.image(450, 332, 'stardew');
   stardew.setDepth(7);
   stardew.setScale(1.2);  
@@ -101,13 +125,15 @@ function create() {
   witchFace2.setVelocity(200, 200);
   witchFace2.setBounce(0.7, 1);
   witchFace2.setCollideWorldBounds(true);
-
-  hills.setInteractive();
-  hills.on('pointerup', function() {
-    hills.setAlpha(0);
+  */
+  bg.setInteractive();
+  bg.on('pointerup', function() {
+    bg.setAlpha(0);
+    /*
     witchFace.setAlpha(0);
     witchFace2.setAlpha(0);
     stardew.setAlpha(0);   
+    */
   });
 
   
@@ -137,21 +163,16 @@ function create() {
 
   //character physics and navigation
   gameState.witchSprite = this.physics.add.sprite(352, 224, "witch");
-  gameState.chickenSprite = this.physics.add.sprite(550, 200, "chicken");
   gameState.witchSprite.setCollideWorldBounds(true);
   //gameState.witchSprite.setBounds(1000, 0, true);
   //var bounds = new Phaser.Rectangle(100,100,400,400);
   gameState.witchSprite.setDepth(5);
   // gameState.setBounds(0, 120, 120, 200);
   this.physics.add.collider(gameState.witchSprite); 
-  gameState.cursors = this.input.keyboard.createCursorKeys();
-
-  this.anims.create ({
-    key: "chickenMove",
-    frames: this.anims.generateFrameNumbers ("chicken",{start: 0, end: 2}),
-    frameRate: 5,
-    repeat:-1
-  })
+  
+  //set movement keys
+  gameState.movementKeys = this.input.keyboard.createCursorKeys();
+  gameState.movementKeys = Object.assign(gameState.movementKeys, this.input.keyboard.addKeys("W,A,S,D"));
 
   this.anims.create({
     key: "left",
@@ -297,36 +318,36 @@ function update () {
   gameState.cropText.setText('Crop Total:' + gameState.numCrops);
   gameState.eggText.setText('Egg Total:' + gameState.numEggs);
 
-  
-  gameState.chickenSprite.anims.play('chickenMove', true);
+  doMovement();
+}
 
-  //navigation
-  if (gameState.cursors.right.isDown && gameState.cursors.up.isDown) {
+function doMovement(){
+  if (gameState.movementKeys.right.isDown && gameState.movementKeys.up.isDown) {
     gameState.witchSprite.x +=3;
     gameState.witchSprite.y -=3;
     gameState.witchSprite.anims.play('right', true);
-  } else if (gameState.cursors.right.isDown && gameState.cursors.down.isDown) {
+  } else if (gameState.movementKeys.right.isDown && gameState.movementKeys.down.isDown) {
     gameState.witchSprite.x +=3;
     gameState.witchSprite.y +=3;
     gameState.witchSprite.anims.play('right', true);
-  } else if (gameState.cursors.left.isDown && gameState.cursors.up.isDown) {
+  } else if (gameState.movementKeys.left.isDown && gameState.movementKeys.up.isDown) {
     gameState.witchSprite.x -=3;
     gameState.witchSprite.y -=3;
     gameState.witchSprite.anims.play('left', true);
-  } else if (gameState.cursors.left.isDown && gameState.cursors.down.isDown) {
+  } else if (gameState.movementKeys.left.isDown && gameState.movementKeys.down.isDown) {
     gameState.witchSprite.x -=3;
     gameState.witchSprite.y +=3;
     gameState.witchSprite.anims.play('left', true);
-  } else if (gameState.cursors.right.isDown) {
+  } else if (gameState.movementKeys.right.isDown || gameState.movementKeys.D.isDown) {
     gameState.witchSprite.x +=3;
     gameState.witchSprite.anims.play('right', true);
-  } else if (gameState.cursors.left.isDown) {
+  } else if (gameState.movementKeys.left.isDown || gameState.movementKeys.A.isDown) {
     gameState.witchSprite.x -=3;
     gameState.witchSprite.anims.play('left', true);
-  } else if (gameState.cursors.down.isDown) {
+  } else if (gameState.movementKeys.down.isDown || gameState.movementKeys.S.isDown) {
     gameState.witchSprite.y +=3;
     gameState.witchSprite.anims.play('down', true);
-  } else if (gameState.cursors.up.isDown) {
+  } else if (gameState.movementKeys.up.isDown || gameState.movementKeys.A.isDown) {
     gameState.witchSprite.y -=3;
     gameState.witchSprite.anims.play('up', true);
   } else {
