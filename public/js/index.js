@@ -93,8 +93,8 @@ function preload() {
   this.load.image("peppers", peppers);
   this.load.image("wateringcan", wateringcan);
   this.load.image("scythe", scythe);
-  this.load.image('witchFace', witchFace);
-  this.load.image('witchFace2', witchFace2);
+  //this.load.image('witchFace', witchFace);
+  //this.load.image('witchFace2', witchFace2);
   this.load.image('hills', hills);
   //this.load.image('egg', egg);
   //this.load.image('grassEgg', grassEgg);
@@ -104,9 +104,10 @@ function create() {
 
   //loading screen
   let bg = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, "startScreen");
-  let scale = Math.max(this.cameras.main.width / bg.width, this.cameras.main.height / bg.height)
+  let scale = Math.max(this.cameras.main.width / bg.width, this.cameras.main.height / bg.height);
   bg.setScale(scale);
   bg.setDepth(10);
+
   /*
   let stardew = this.add.image(450, 332, 'stardew');
   stardew.setDepth(7);
@@ -135,6 +136,20 @@ function create() {
     stardew.setAlpha(0);   
     */
   });
+  //end loading screen
+
+  this.scale.on('resize', function (gameSize)
+  {
+
+      const width = gameSize.width;
+      const height = gameSize.height;
+
+      this.cameras.resize(width, height);
+
+      //bg.setSize(width, height);
+      //logo.setPosition(width / 2, height / 2);
+
+  }, this);
 
   
   //platforms.create(600, 400, '');
@@ -311,10 +326,11 @@ function update () {
     }
   }
 
-  // egg logic
+  /*
   if(gameState.initialTime % 30 == 0 && gameState.initialTime !== 0) {
     gameState.eggTile.setTexture("egg");
   }
+  */
 
   //update totals
   gameState.cropText.setText('Crop Total:' + gameState.numCrops);
