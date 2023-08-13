@@ -3,7 +3,7 @@ import farmbg from "../assets/background-image.png";
 import witch from "../assets/farmer-walk.png";
 import dirt from "../assets/grow/dirt.png";
 import sprout from "../assets/grow/sprout.png";
-import sounds from "../assets/mines-themes.mp3";
+import startMusic from "../assets/start_theme.mp3";
 import seeds from "../assets/grow/seeds.png";
 import tomato from "../assets/grow/tomato.png";
 import lettuce from "../assets/grow/lettuce.png";
@@ -16,8 +16,8 @@ import witchFace from "../assets/character-faces/witch-face-1.png";
 import witchFace2 from "../assets/character-faces/witch-face-2.png";
 import hills from "../assets/hills.png";
 import startScreen from "../assets/startScreen.png";
-import egg from "../assets/egg.png";
-import grassEgg from "../assets/grass-egg.png";
+//import egg from "../assets/egg.png";
+//import grassEgg from "../assets/grass-egg.png";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -66,7 +66,7 @@ const analytics = getAnalytics(app);
 
 const gameState = {
   numCrops: 0,
-  numEggs: 0,
+  //numEggs: 0,
   initialTime: 0,
   stageOne: dirt,
   stageTwo: seeds,
@@ -80,7 +80,7 @@ addEventListener("resize", (event) => {});
 
 function preload() {
   this.load.image('startScreen', startScreen);
-  this.load.audio('mines-themes', sounds);
+  this.load.audio('startMusic', startMusic);
   this.load.image("farmBackground", farmbg);
   this.load.spritesheet("witch", witch, { frameWidth: 96, frameHeight: 128});
   this.load.image("sprout", sprout);
@@ -96,8 +96,8 @@ function preload() {
   this.load.image('witchFace', witchFace);
   this.load.image('witchFace2', witchFace2);
   this.load.image('hills', hills);
-  this.load.image('egg', egg);
-  this.load.image('grassEgg', grassEgg);
+  //this.load.image('egg', egg);
+  //this.load.image('grassEgg', grassEgg);
 }
 
 function create() {
@@ -142,7 +142,7 @@ function create() {
   
   //gamedesign
   let background = this.add.image(352, 352, "farmBackground");
-  gameState.music = this.sound.play('mines-themes', {
+  gameState.music = this.sound.play('startMusic', {
     loop: true,
     volume: 0.1
   });
@@ -152,7 +152,7 @@ function create() {
   // platforms.create(200, 352, 'farmBackground');
 
   gameState.cropText = this.add.text(760, 620, 'Crop Total:' + gameState.numCrops, { fontSize: '30px', fill: '#FFFFFF' });
-  gameState.eggText = this.add.text(760, 650, 'Egg Total:' + gameState.numEggs, { fontSize: '30px', fill: '#FFFFFF' });
+  //gameState.eggText = this.add.text(760, 650, 'Egg Total:' + gameState.numEggs, { fontSize: '30px', fill: '#FFFFFF' });
 
   gameState.seedButton = this.add.image(864, 100, "seeds");
   gameState.seedButton.setScale(2);
@@ -223,15 +223,17 @@ function create() {
       });
     }
   }
-
+  /*
   gameState.eggTile = this.add.image(480, 200, "grassEgg");
   gameState.eggTile.setInteractive();
   gameState.eggTile.on('pointerup', function() {
+    
     if(gameState.eggTile.texture.key === "egg") {
       gameState.numEggs += 1;
       gameState.eggTile.setTexture("grassEgg");
     }
   })
+    */
 
   gameState.waterButton.setInteractive();
   gameState.waterButton.on('pointerup', function() {
@@ -316,41 +318,49 @@ function update () {
 
   //update totals
   gameState.cropText.setText('Crop Total:' + gameState.numCrops);
-  gameState.eggText.setText('Egg Total:' + gameState.numEggs);
+  //gameState.eggText.setText('Egg Total:' + gameState.numEggs);
 
   doMovement();
 }
 
 function doMovement(){
-  if (gameState.movementKeys.right.isDown && gameState.movementKeys.up.isDown) {
-    gameState.witchSprite.x +=3;
-    gameState.witchSprite.y -=3;
+  if (gameState.movementKeys.right.isDown && gameState.movementKeys.up.isDown || gameState.movementKeys.D.isDown && gameState.movementKeys.W.isDown) {
+    gameState.witchSprite.x +=2;
+    gameState.witchSprite.y -=2;
     gameState.witchSprite.anims.play('right', true);
-  } else if (gameState.movementKeys.right.isDown && gameState.movementKeys.down.isDown) {
-    gameState.witchSprite.x +=3;
-    gameState.witchSprite.y +=3;
+  } 
+  else if (gameState.movementKeys.right.isDown && gameState.movementKeys.down.isDown || gameState.movementKeys.D.isDown && gameState.movementKeys.S.isDown) {
+    gameState.witchSprite.x +=2;
+    gameState.witchSprite.y +=2;
     gameState.witchSprite.anims.play('right', true);
-  } else if (gameState.movementKeys.left.isDown && gameState.movementKeys.up.isDown) {
-    gameState.witchSprite.x -=3;
-    gameState.witchSprite.y -=3;
+  } 
+  else if (gameState.movementKeys.left.isDown && gameState.movementKeys.up.isDown || gameState.movementKeys.A.isDown && gameState.movementKeys.W.isDown) {
+    gameState.witchSprite.x -=2;
+    gameState.witchSprite.y -=2;
     gameState.witchSprite.anims.play('left', true);
-  } else if (gameState.movementKeys.left.isDown && gameState.movementKeys.down.isDown) {
-    gameState.witchSprite.x -=3;
-    gameState.witchSprite.y +=3;
+  } 
+  else if (gameState.movementKeys.left.isDown && gameState.movementKeys.down.isDown || gameState.movementKeys.A.isDown && gameState.movementKeys.S.isDown) {
+    gameState.witchSprite.x -=2;
+    gameState.witchSprite.y +=2;
     gameState.witchSprite.anims.play('left', true);
-  } else if (gameState.movementKeys.right.isDown || gameState.movementKeys.D.isDown) {
-    gameState.witchSprite.x +=3;
+  } 
+  else if (gameState.movementKeys.right.isDown || gameState.movementKeys.D.isDown) {
+    gameState.witchSprite.x +=2;
     gameState.witchSprite.anims.play('right', true);
-  } else if (gameState.movementKeys.left.isDown || gameState.movementKeys.A.isDown) {
-    gameState.witchSprite.x -=3;
+  } 
+  else if (gameState.movementKeys.left.isDown || gameState.movementKeys.A.isDown) {
+    gameState.witchSprite.x -=2;
     gameState.witchSprite.anims.play('left', true);
-  } else if (gameState.movementKeys.down.isDown || gameState.movementKeys.S.isDown) {
-    gameState.witchSprite.y +=3;
+  } 
+  else if (gameState.movementKeys.down.isDown || gameState.movementKeys.S.isDown) {
+    gameState.witchSprite.y +=2;
     gameState.witchSprite.anims.play('down', true);
-  } else if (gameState.movementKeys.up.isDown || gameState.movementKeys.A.isDown) {
-    gameState.witchSprite.y -=3;
+  } 
+  else if (gameState.movementKeys.up.isDown || gameState.movementKeys.W.isDown) {
+    gameState.witchSprite.y -=2;
     gameState.witchSprite.anims.play('up', true);
-  } else {
+  } 
+  else {
     gameState.witchSprite.anims.stop();
   }
 }
